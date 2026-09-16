@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sermon Trainer</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2933;--muted:#667085;--line:#ddd8cf;--accent:#5f6f52;--accent2:#8b6f47;--soft:#eef2e9}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#263528;color:#fff;padding:18px 24px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.header-inner{max-width:1280px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand h1{margin:0;font-size:24px}.brand small{opacity:.8}.actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;background:var(--accent);color:#fff;text-decoration:none;display:inline-block}.secondary{background:#fff;color:#263528}.outline{background:transparent;border:1px solid #b9c4b5;color:#263528}.brown{background:var(--accent2)}
+main{max-width:1280px;margin:22px auto;padding:0 18px 50px;display:grid;grid-template-columns:280px 1fr;gap:18px}.sidebar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;height:max-content;position:sticky;top:94px}.side-title{font-weight:800;margin-bottom:10px}.step{padding:10px;border-radius:8px;margin:4px 0;font-size:14px}.step.active{background:var(--soft);font-weight:700}.step .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#e7e4dc;margin-right:8px}.step.active .n{background:var(--accent);color:#fff}
+.content{display:flex;flex-direction:column;gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.03)}h2{margin:0 0 12px;font-size:20px}h3{margin:16px 0 8px;font-size:16px}.hint{color:var(--muted);font-size:13px;margin-bottom:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}label{font-size:13px;font-weight:700;display:block;margin-bottom:5px}input,textarea,select{width:100%;border:1px solid #cfcac2;border-radius:8px;padding:10px;background:#fff;color:var(--ink);font:inherit}textarea{min-height:105px;resize:vertical}.smallarea{min-height:70px}.storyline{display:grid;grid-template-columns:1fr 42px 1fr 42px 1fr;align-items:stretch;gap:8px}.storybox{background:#faf9f6;border:1px solid var(--line);border-radius:12px;padding:12px}.arrow{display:grid;place-items:center;font-size:26px;color:var(--accent2)}.tag{display:inline-block;border-radius:999px;background:var(--soft);padding:4px 8px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}.scripture-row{display:grid;grid-template-columns:1fr 150px;gap:8px;margin-bottom:8px}.scripture-list{margin-top:8px}.scripture-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #eee}.scripture-item:last-child{border-bottom:0}.scripture-ref{font-weight:700}.tiny{font-size:12px;color:var(--muted)}.export-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.export-card{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fafafa}.export-card h3{margin-top:0}.save-status{font-size:12px;color:#d9e8d5;margin-left:10px}.ai-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}.ai-btn{background:#314d73}.ai-panel{display:none;background:#f4f7fb;border:1px solid #cfd9e7;border-radius:12px;padding:12px;margin:10px 0}.ai-panel.show{display:block}.ai-title{font-weight:800;margin-bottom:6px}.ai-item{background:#fff;border:1px solid #dce3ec;border-radius:9px;padding:10px;margin:8px 0}.ai-item p{margin:5px 0;white-space:pre-wrap}.ai-item-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.ai-note{font-size:12px;color:#526173}.locked{background:#fff8e8;border:1px solid #ead7a4;border-radius:10px;padding:10px;margin-bottom:12px}.locked strong{color:#6d531c}.loading{opacity:.7;pointer-events:none}
+@media(max-width:900px){main{grid-template-columns:1fr}.sidebar{position:static}.storyline{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.grid2,.grid3,.export-grid{grid-template-columns:1fr}.header-inner{align-items:flex-start;flex-direction:column}.scripture-row{grid-template-columns:1fr}}
+@media print{header,.sidebar,.no-print{display:none!important}main{display:block;margin:0;padding:0}.card{border:0;box-shadow:none;page-break-inside:avoid}.content{gap:0}body{background:#fff;font-size:11pt}.print-only{display:block!important}}
+.print-only{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand"><h1>Sermon Trainer</h1><small>Study deeply. Prepare faithfully. Write your own message.</small><span id="saveStatus" class="save-status">Saved locally</span></div>
+    <div class="actions no-print"><button class="secondary" onclick="newStudy()">New Study</button><button class="brown" onclick="exportCombined()">Combined Preacher Pack</button></div>
+  </div>
+</header>
+<main>
+  <aside class="sidebar no-print">
+    <div class="side-title">Preparation pathway</div>
+    <div class="step active"><span class="n">1</span>Prayer / Topic</div>
+    <div class="step"><span class="n">2</span>Opening Scripture</div>
+    <div class="step"><span class="n">3</span>Original Context</div>
+    <div class="step"><span class="n">4</span>Old Testament Foundation</div>
+    <div class="step"><span class="n">5</span>New Testament Fulfilment</div>
+    <div class="step"><span class="n">6</span>Cross References</div>
+    <div class="step"><span class="n">7</span>Illustrations</div>
+    <div class="step"><span class="n">8</span>Personal Reflection</div>
+    <div class="step"><span class="n">9</span>Central Truth</div>
+    <div class="step"><span class="n">10</span>Structure</div>
+    <div class="step"><span class="n">11</span>Application</div>
+    <div class="step"><span class="n">12</span>PDFs</div>
+  </aside>
+
+  <section class="content">
+    <div class="card">
+      <h2>1. Prayer / Topic</h2>
+      <p class="hint">The app guides the preparation. It does not write the sermon or lesson for you.</p>
+      <div class="grid2">
+        <div><label>Study title / topic</label><input id="title" placeholder="e.g. God provides" /></div>
+        <div><label>Mode</label><select id="mode"><option>Preach</option><option>Teach</option></select></div>
+      </div>
+      <label style="margin-top:12px">What have you been praying or thinking about?</label>
+      <textarea id="prayer" placeholder="Write your own thoughts, questions, concerns or prompt for study..."></textarea>
+    </div>
+
+    <div class="card">
+      <h2>2. Opening Scripture</h2>
+      <div class="grid2">
+        <div><label>Main passage</label><input id="mainScripture" placeholder="e.g. Matthew 6:25–34" /></div>
+        <div><label>Main theme you see</label><input id="mainTheme" placeholder="Your wording" /></div>
+      </div>
+      <div style="margin-top:10px"><button class="outline" onclick="openBible('mainScripture')">Open passage in Bible.com (AMP)</button></div>
+    </div>
+
+    <div class="card">
+      <h2>3. Original Context</h2>
+      <div class="ai-bar"><button class="ai-btn" onclick="runAi('context')">AI Research Assist</button><span class="ai-note">Research assistance only — review before adding anything to your study.</span></div>
+      <div id="aiContext" class="ai-panel"></div>
+      <div class="grid2">
+        <div><label>Historical / cultural setting</label><textarea id="history" placeholder="Who, where, when, social setting, customs..."></textarea></div>
+        <div><label>Literary / biblical context</label><textarea id="literary" placeholder="What happens before and after? Who is speaking? To whom?"></textarea></div>
+      </div>
+      <div class="grid2">
+        <div><label>Important words / concepts</label><textarea id="words" class="smallarea"></textarea></div>
+        <div><label>Questions still to investigate</label><textarea id="questions" class="smallarea"></textarea></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Biblical Storyline</h2>
+      <p class="hint">Trace the theme through Scripture without assuming every similarity is a direct prophecy.</p>
+      <div class="storyline">
+        <div class="storybox"><span class="tag">Old Testament</span><h3>4. Foundation / Illustration</h3><div class="ai-bar"><button class="ai-btn" onclick="runAi('ot')">AI Research Assist</button></div><div id="aiOt" class="ai-panel"></div><label>Passage</label><input id="otScripture" placeholder="e.g. Exodus 16"/><label>What happens?</label><textarea id="otNotes" class="smallarea"></textarea><button class="outline" onclick="openBible('otScripture')">Open AMP</button></div>
+        <div class="arrow">→</div>
+        <div class="storybox"><span class="tag">Opening Text</span><h3>Central Passage</h3><p class="tiny">Your main Scripture anchors the study.</p><label>Connection to the theme</label><textarea id="centralConnection" class="smallarea"></textarea></div>
+        <div class="arrow">→</div>
+        <div class="storybox"><span class="tag">New Testament</span><h3>5. Fulfilment / Development</h3><div class="ai-bar"><button class="ai-btn" onclick="runAi('nt')">AI Research Assist</button></div><div id="aiNt" class="ai-panel"></div><label>Passage</label><input id="ntScripture" placeholder="e.g. John 6 / Philippians 4:19"/><label>How is the theme fulfilled or developed?</label><textarea id="ntNotes" class="smallarea"></textarea><select id="connectionType"><option>Direct fulfilment</option><option>Biblical pattern / typology</option><option>Thematic connection</option><option>Further development</option></select><button class="outline" style="margin-top:8px" onclick="openBible('ntScripture')">Open AMP</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>6. Cross References & Scriptures Used</h2>
+      <p class="hint">Add references only. The export creates a clean Scripture sheet with Bible.com links.</p>
+      <div class="scripture-row"><input id="scriptureInput" placeholder="e.g. Hebrews 10:1–14"/><button onclick="addScripture()">Add Scripture</button></div>
+      <div id="scriptureList" class="scripture-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>7. Illustrations</h2>
+      <p class="hint">Ask AI for several possible biblical and historical illustrations. Nothing is inserted automatically — choose only the examples that genuinely support your passage.</p>
+      <div class="ai-bar"><button class="ai-btn" onclick="runAi('illustrations')">Suggest Illustrations</button><span class="ai-note">Choose an illustration, then edit it in your own words.</span></div>
+      <div id="aiIllustrations" class="ai-panel"></div>
+      <div class="grid2">
+        <div><label>Chosen biblical illustration</label><textarea id="bibIllustration" placeholder="Event/person/passages and why it connects"></textarea></div>
+        <div><label>Chosen historical illustration</label><textarea id="histIllustration" placeholder="Verified historical example, source and relevance"></textarea></div>
+      </div>
+      <label>Source / accuracy notes</label><textarea id="illustrationSources" class="smallarea"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>8–9. Reflection & Central Truth</h2>
+      <div class="grid2">
+        <div><label>Personal reflection</label><textarea id="reflection" placeholder="What challenged you? What do you need to understand more clearly?"></textarea></div>
+        <div><label>Central truth — in your own words</label><textarea id="centralTruth" placeholder="What is the central biblical truth you want to communicate?"></textarea></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>10. Sermon / Lesson Structure</h2>
+      <div class="locked"><strong>Your work — AI disabled.</strong><br><span class="tiny">The app can research and suggest material in earlier sections, but it will not generate your sermon points, application or conclusion. Build this section yourself from your prayer, study and reflection.</span></div>
+      <div class="grid3">
+        <div><label>Opening / question</label><textarea id="opening" class="smallarea"></textarea></div>
+        <div><label>Point 1</label><textarea id="point1" class="smallarea"></textarea></div>
+        <div><label>Point 2</label><textarea id="point2" class="smallarea"></textarea></div>
+        <div><label>Point 3</label><textarea id="point3" class="smallarea"></textarea></div>
+        <div><label>Application</label><textarea id="application" class="smallarea"></textarea></div>
+        <div><label>Conclusion / prayer prompt</label><textarea id="conclusion" class="smallarea"></textarea></div>
+      </div>
+    </div>
+
+    <div class="card no-print">
+      <h2>12. Preacher PDF Exports</h2>
+      <p class="hint">Each option opens a print-ready view. Choose “Save as PDF” in your browser print dialog.</p>
+      <div class="export-grid">
+        <div class="export-card"><h3>1. Dot Points</h3><p class="tiny">Compact speaking outline for the pulpit, lectern or iPad.</p><button onclick="exportDotPoints()">Create Dot Point PDF</button></div>
+        <div class="export-card"><h3>2. Scriptures Used</h3><p class="tiny">Every passage grouped with direct AMP links.</p><button onclick="exportScriptures()">Create Scripture PDF</button></div>
+        <div class="export-card"><h3>3. Detailed View</h3><p class="tiny">Full study, context, illustrations, notes and structure.</p><button onclick="exportDetailed()">Create Detailed PDF</button></div>
+        <div class="export-card"><h3>4. Combined Pack</h3><p class="tiny">All three sections in one preacher preparation pack.</p><button class="brown" onclick="exportCombined()">Create Combined PDF</button></div>
+        <div class="export-card"><h3>Student / Participant</h3><p class="tiny">Clean handout with Scripture, key idea, questions and note space.</p><button onclick="exportStudent()">Create Student PDF</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+const ids=['title','mode','prayer','mainScripture','mainTheme','history','literary','words','questions','otScripture','otNotes','centralConnection','ntScripture','ntNotes','connectionType','bibIllustration','histIllustration','illustrationSources','reflection','centralTruth','opening','point1','point2','point3','application','conclusion'];
+let scriptures=[];
+function save(){const data={};ids.forEach(id=>data[id]=document.getElementById(id).value);data.scriptures=scriptures;localStorage.setItem('sermonTrainerStudy',JSON.stringify(data));document.getElementById('saveStatus').textContent='Saved locally';}
+function load(){try{const data=JSON.parse(localStorage.getItem('sermonTrainerStudy')||'{}');ids.forEach(id=>{if(data[id]!=null)document.getElementById(id).value=data[id]});scriptures=data.scriptures||[];renderScriptures()}catch(e){}}
+ids.forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)save()}));
+
+function aiPayload(){return {title:val('title'),topic:val('prayer'),mainScripture:val('mainScripture'),mainTheme:val('mainTheme'),history:val('history'),literary:val('literary'),words:val('words'),otScripture:val('otScripture'),otNotes:val('otNotes'),ntScripture:val('ntScripture'),ntNotes:val('ntNotes')}}
+function aiPanel(type){return document.getElementById({context:'aiContext',ot:'aiOt',nt:'aiNt',illustrations:'aiIllustrations'}[type])}
+async function runAi(type){
+ const panel=aiPanel(type); panel.className='ai-panel show loading'; panel.innerHTML='<div class="ai-title">AI Research Assist</div><p class="ai-note">Researching your topic and passage…</p>';
+ if(!val('mainScripture') && type!=='illustrations'){panel.classList.remove('loading');panel.innerHTML='<div class="ai-title">Add an opening Scripture first</div><p class="ai-note">The assistant needs your main passage so it can keep the research anchored to the text.</p>';return}
+ try{const r=await fetch('/api/ai-study',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...aiPayload()})}); const data=await r.json(); if(!r.ok)throw new Error(data.error||'AI request failed'); renderAi(type,data)}catch(err){panel.classList.remove('loading');panel.innerHTML=`<div class="ai-title">AI connection not available</div><p class="ai-note">${esc(err.message)}. When this prototype is run with the included Node server and OPENAI_API_KEY, these buttons use the AI research endpoint.</p>`}}
+function renderAi(type,data){const panel=aiPanel(type);panel.className='ai-panel show'; if(type==='context'){panel.innerHTML=`<div class="ai-title">Review AI research suggestions</div>${aiField('Historical / cultural setting',data.history,'history')}${aiField('Literary / biblical context',data.literary,'literary')}${aiField('Important words / concepts',data.words,'words')}${aiField('Questions to investigate',data.questions,'questions')}`;return} if(type==='ot'){panel.innerHTML=`<div class="ai-title">Possible Old Testament foundation</div>${aiChoice(data.passage,data.notes,'otScripture','otNotes',data.connection)}`;return} if(type==='nt'){panel.innerHTML=`<div class="ai-title">Possible New Testament fulfilment / development</div>${aiChoice(data.passage,data.notes,'ntScripture','ntNotes',data.connection,data.connectionType)}`;return} if(type==='illustrations'){const items=(data.illustrations||[]).map((x,i)=>`<div class="ai-item"><b>${esc(x.kind||'Illustration')} — ${esc(x.title||('Option '+(i+1)))}</b><p>${esc(x.summary||'')}</p><p class="ai-note"><b>Why it may connect:</b> ${esc(x.relevance||'')}<br><b>Verify:</b> ${esc(x.sourceNote||'Confirm details with a reliable source before preaching.')}</p><div class="ai-item-actions"><button class="outline" onclick='chooseIllustration(${JSON.stringify(JSON.stringify(x))})'>Use this illustration</button></div></div>`).join('');panel.innerHTML='<div class="ai-title">Choose an illustration to develop</div>'+items}}
+function aiField(label,text,target){return `<div class="ai-item"><b>${esc(label)}</b><p>${esc(text||'')}</p><div class="ai-item-actions"><button class="outline" onclick='applyAiText(${JSON.stringify(target)},${JSON.stringify(text||'')})'>Use suggestion</button></div></div>`}
+function aiChoice(passage,notes,targetPassage,targetNotes,connection,connectionType){return `<div class="ai-item"><b>${esc(passage||'Suggested passage')}</b><p>${esc(notes||'')}</p>${connection?`<p class="ai-note"><b>Connection:</b> ${esc(connection)}</p>`:''}<div class="ai-item-actions"><button class="outline" onclick='applyAiText(${JSON.stringify(targetPassage)},${JSON.stringify(passage||'')});applyAiText(${JSON.stringify(targetNotes)},${JSON.stringify(notes||'')})'>Use suggestion</button></div></div>`}
+function applyAiText(id,text){document.getElementById(id).value=text;save()}
+function chooseIllustration(json){const x=JSON.parse(json);const target=(x.kind||'').toLowerCase().includes('histor')?'histIllustration':'bibIllustration';document.getElementById(target).value=[x.title,x.summary,x.relevance].filter(Boolean).join(' — ');if(x.sourceNote){const src=document.getElementById('illustrationSources');src.value=(src.value?src.value+'\n':'')+x.title+': '+x.sourceNote}save()}
+
+function addScripture(){const el=document.getElementById('scriptureInput');const v=el.value.trim();if(!v)return;scriptures.push(v);el.value='';renderScriptures();save()}
+function renderScriptures(){const box=document.getElementById('scriptureList');box.innerHTML='';scriptures.forEach((s,i)=>{const row=document.createElement('div');row.className='scripture-item';row.innerHTML=`<div><span class="scripture-ref">${esc(s)}</span><div class="tiny">Supporting Scripture</div></div><div><button class="outline" onclick="openRef('${jsesc(s)}')">Open AMP</button> <button class="outline" onclick="removeScripture(${i})">Remove</button></div>`;box.appendChild(row)})}
+function removeScripture(i){scriptures.splice(i,1);renderScriptures();save()}
+function openBible(id){const ref=document.getElementById(id).value.trim();openRef(ref)}
+function openRef(ref){if(!ref)return;const q=encodeURIComponent(ref+' AMP');window.open('https://www.bible.com/search/bible?q='+q,'_blank')}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function jsesc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+function val(id){return document.getElementById(id).value.trim()}
+function allScriptures(){return [...new Set([val('mainScripture'),val('otScripture'),val('ntScripture'),...scriptures].filter(Boolean))]}
+function openExport(title,body){const w=window.open('','_blank');w.document.write(`<!doctype html><html><head><title>${esc(title)}</title><style>body{font-family:Arial,sans-serif;margin:36px;color:#20242a;line-height:1.45}h1{font-size:25px;margin-bottom:3px}h2{font-size:18px;border-bottom:1px solid #ccc;padding-bottom:5px;margin-top:24px}h3{font-size:15px;margin:14px 0 4px}.muted{color:#666;font-size:12px}.section{margin-bottom:18px}.box{border:1px solid #ddd;padding:10px;border-radius:8px;margin:8px 0}ul{padding-left:22px}a{color:#294e7a}.page{page-break-before:always}.footer{margin-top:30px;font-size:10px;color:#777}</style></head><body>${body}<div class="footer">Prepared with Sermon Trainer — study assistance only; sermon/lesson content remains the user's own work.</div><script>setTimeout(()=>window.print(),250)<\/script></body></html>`);w.document.close()}
+function heading(sub){return `<h1>${esc(val('title')||'Untitled Study')}</h1><div class="muted">${esc(val('mode'))} • ${sub}</div>`}
+function dotBody(){return heading('Dot Point Preacher Notes')+`<h2>Opening Scripture</h2><ul><li><b>${esc(val('mainScripture'))}</b></li><li>${esc(val('mainTheme'))}</li></ul><h2>Biblical Storyline</h2><ul><li><b>OT foundation:</b> ${esc(val('otScripture'))} — ${esc(val('otNotes'))}</li><li><b>Main passage:</b> ${esc(val('mainScripture'))}</li><li><b>NT fulfilment/development:</b> ${esc(val('ntScripture'))} — ${esc(val('ntNotes'))}</li><li><b>Connection:</b> ${esc(val('connectionType'))}</li></ul><h2>Central Truth</h2><div class="box">${esc(val('centralTruth'))}</div><h2>Speaking Outline</h2><ul><li><b>Opening:</b> ${esc(val('opening'))}</li><li><b>Point 1:</b> ${esc(val('point1'))}</li><li><b>Point 2:</b> ${esc(val('point2'))}</li><li><b>Point 3:</b> ${esc(val('point3'))}</li><li><b>Application:</b> ${esc(val('application'))}</li><li><b>Conclusion / prayer:</b> ${esc(val('conclusion'))}</li></ul><h2>Illustration Cues</h2><ul><li><b>Biblical:</b> ${esc(val('bibIllustration'))}</li><li><b>Historical:</b> ${esc(val('histIllustration'))}</li></ul>`}
+function scripturesBody(){return heading('Scriptures Used')+`<h2>Primary & Storyline Passages</h2>${allScriptures().map((s,i)=>`<div class="box"><b>${i+1}. ${esc(s)}</b><br><a href="https://www.bible.com/search/bible?q=${encodeURIComponent(s+' AMP')}">Open ${esc(s)} in Bible.com (AMP search)</a></div>`).join('')||'<p>No Scriptures entered.</p>'}`}
+function detailedBody(){return heading('Detailed Preacher Study')+`<h2>Prayer / Topic</h2><div class="box">${esc(val('prayer'))}</div><h2>Opening Scripture</h2><div class="box"><b>${esc(val('mainScripture'))}</b><br>${esc(val('mainTheme'))}</div><h2>Original Context</h2><h3>Historical / Cultural</h3><div class="box">${esc(val('history'))}</div><h3>Literary / Biblical</h3><div class="box">${esc(val('literary'))}</div><h3>Important Words / Concepts</h3><div class="box">${esc(val('words'))}</div><h3>Questions to Investigate</h3><div class="box">${esc(val('questions'))}</div><h2>Old Testament Foundation</h2><div class="box"><b>${esc(val('otScripture'))}</b><br>${esc(val('otNotes'))}</div><h2>Central Passage Connection</h2><div class="box">${esc(val('centralConnection'))}</div><h2>New Testament Fulfilment / Development</h2><div class="box"><b>${esc(val('ntScripture'))}</b><br>${esc(val('ntNotes'))}<br><span class="muted">${esc(val('connectionType'))}</span></div><h2>Illustrations</h2><h3>Biblical</h3><div class="box">${esc(val('bibIllustration'))}</div><h3>Historical</h3><div class="box">${esc(val('histIllustration'))}</div><h3>Sources / Accuracy Notes</h3><div class="box">${esc(val('illustrationSources'))}</div><h2>Personal Reflection</h2><div class="box">${esc(val('reflection'))}</div><h2>Central Truth</h2><div class="box">${esc(val('centralTruth'))}</div><h2>Sermon / Lesson Structure</h2><div class="box"><b>Opening:</b> ${esc(val('opening'))}<br><br><b>Point 1:</b> ${esc(val('point1'))}<br><br><b>Point 2:</b> ${esc(val('point2'))}<br><br><b>Point 3:</b> ${esc(val('point3'))}<br><br><b>Application:</b> ${esc(val('application'))}<br><br><b>Conclusion / prayer:</b> ${esc(val('conclusion'))}</div>`}
+function exportDotPoints(){openExport((val('title')||'Study')+' - Dot Points',dotBody())}
+function exportScriptures(){openExport((val('title')||'Study')+' - Scriptures',scripturesBody())}
+function exportDetailed(){openExport((val('title')||'Study')+' - Detailed',detailedBody())}
+function studentBody(){return heading('Student / Participant Handout')+`<h2>Opening Scripture</h2><div class="box"><b>${esc(val('mainScripture'))}</b></div><h2>Key Idea</h2><div class="box">${esc(val('centralTruth'))}</div><h2>Biblical Storyline</h2><ul><li><b>Old Testament:</b> ${esc(val('otScripture'))}</li><li><b>Main passage:</b> ${esc(val('mainScripture'))}</li><li><b>New Testament:</b> ${esc(val('ntScripture'))}</li></ul><h2>Discussion / Reflection</h2><div class="box">${esc(val('questions')) || 'What stands out to you in these passages?'}<br><br><br><br></div><h2>My Notes</h2><div class="box" style="min-height:220px"></div><h2>Application</h2><div class="box">What might this mean for my life this week?<br><br><br></div>`}
+function exportStudent(){openExport((val('title')||'Study')+' - Student Handout',studentBody())}
+function exportCombined(){openExport((val('title')||'Study')+' - Preacher Pack',dotBody()+`<div class="page"></div>`+scripturesBody()+`<div class="page"></div>`+detailedBody())}
+function newStudy(){if(!confirm('Start a new study? This will clear the locally saved study.'))return;localStorage.removeItem('sermonTrainerStudy');location.reload()}
+load();
+</script>
+</body>
+</html>
