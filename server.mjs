@@ -105,14 +105,20 @@ app.post('/api/ai-study', rateLimit, async (req, res) => {
   }
 });
 
-// Serve the main page with the local backup/restore module injected.
+// Serve the main page with the local backup/restore module injected immediately
+// before the final real </body> tag. Using replace('</body>', ...) is unsafe here
+// because index.html contains </body> text inside the PDF export JavaScript template.
 app.get('/', (_req, res) => {
   try {
     const indexPath = path.join(__dirname, 'index.html');
-    const html = fs.readFileSync(indexPath, 'utf8').replace(
-      '</body>',
-      '<script src="/backup.js"></script>\n</body>'
-    );
+    const source = fs.readFileSync(indexPath, 'utf8');
+    const closingBody = source.lastIndexOf('</body>');
+    if (closingBody === -1) {
+      throw new Error('index.html has no closing body tag');
+    }
+    const html = source.slice(0, closingBody)
+      + '<script src="/backup.js"></script>\n'
+      + source.slice(closingBody);
     res.type('html').send(html);
   } catch (error) {
     console.error('Unable to load Sermon Trainer:', error);
