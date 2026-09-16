@@ -176,6 +176,15 @@
       });
     }
 
+    if (!document.getElementById('eduAppsFooter')) {
+      const footer = document.createElement('footer');
+      footer.id = 'eduAppsFooter';
+      footer.className = 'no-print';
+      footer.style.cssText = 'max-width:1280px;margin:0 auto 32px;padding:0 18px;text-align:center;color:#667085;font-size:13px;';
+      footer.innerHTML = 'Developed and maintained by <strong>EDU Apps Plus</strong> &nbsp;•&nbsp; <a href="mailto:enquiries@eduappsplus.com.au" style="color:#5f6f52;text-decoration:none;font-weight:700">enquiries@eduappsplus.com.au</a>';
+      document.body.appendChild(footer);
+    }
+
     const last = localStorage.getItem('sermonTrainerLastSaved');
     if (last) {
       const d = new Date(last);
