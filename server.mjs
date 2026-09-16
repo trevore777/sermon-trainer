@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import OpenAI from 'openai';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -11,7 +12,6 @@ const model = process.env.OPENAI_MODEL || 'gpt-5.6-luna';
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '200kb' }));
-app.use(express.static(__dirname, { extensions: ['html'], maxAge: '1h' }));
 
 const client = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -105,7 +105,24 @@ app.post('/api/ai-study', rateLimit, async (req, res) => {
   }
 });
 
-app.get('*', (_req, res) => {
+// Serve the main page with the local backup/restore module injected.
+app.get('/', (_req, res) => {
+  try {
+    const indexPath = path.join(__dirname, 'index.html');
+    const html = fs.readFileSync(indexPath, 'utf8').replace(
+      '</body>',
+      '<script src="/backup.js"></script>\n</body>'
+    );
+    res.type('html').send(html);
+  } catch (error) {
+    console.error('Unable to load Sermon Trainer:', error);
+    res.status(500).send('Unable to load Sermon Trainer.');
+  }
+});
+
+app.use(express.static(__dirname, { extensions: ['html'], maxAge: '1h' }));
+
+app.get('/*splat', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
